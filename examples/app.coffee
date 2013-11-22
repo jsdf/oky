@@ -98,4 +98,3 @@ app =
 
     # start
     @router.go('home')
-
