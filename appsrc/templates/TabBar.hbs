@@ -1,0 +1,10 @@
+<nav class="bar-tab">
+  <ul class="tab-inner">
+  {{#tabs}}
+    <li class="tab-item{{#active}} active{{/active}}{{#name}} tab-{{this}}{{/name}}" data-tab-name="{{name}}">
+      <div class="tab-icon">{{#icon}}<i class="icon-{{this}}"></i>{{/icon}}</div>
+      <div class="tab-label">{{label}}</div>
+    </li>
+  {{/tabs}}
+  </ul>
+</nav>  

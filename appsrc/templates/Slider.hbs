@@ -1,0 +1,11 @@
+<label>
+  <div class="label-text">{{label}}</div>
+  <input{{#attr fieldAttributes}}{{/attr}}>
+  {{#if labelMin}}
+  <div class="slider-labels">
+    <div class="slider-label min">{{labelMin}}</div>
+    {{#if labelMid}}<div class="slider-label mid">{{labelMid}}</div>{{/if}}
+    <div class="slider-label max">{{labelMax}}</div>
+  </div>
+  {{/if}}
+</label>
