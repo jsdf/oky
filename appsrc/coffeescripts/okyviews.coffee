@@ -1,15 +1,40 @@
-Handlebars.registerHelper('attr', (context = {}, options) ->
+###
+'Attr' helper for templates
+###
+Handlebars.registerHelper 'attr', (context = {}, options) ->
   attributes = []
   attributes.push(attribute + '="' + value + '"') for attribute, value of context
   ' ' + attributes.join(' ')
-)
+
+###
+A hack to improve usability of tappable and draggable elements
+by increasing touchable area.
+@param scale [Number] multiplier to scale the touchable area by.
+###
+jQuery.fn.addTouchHandle = (scale = 2) ->
+  percentage = scale*100
+  offset = percentage/2 - 50
+
+  $handle = $('<div class="touch-handle"></div>').css
+    position: 'absolute'
+    display: 'block'
+    width: percentage+'%'
+    height: percentage+'%'
+    left: '-'+offset+'%'
+    top: '-'+offset+'%'
+  
+  this.each(-> $(this).append($handle.clone()))
+  return this
+
 
 ###
 Base View for all views which utilise a template
 ###
 
-class TemplateView extends DHM.View
-  template: 'Default'
+Oky.Views = Oky.Views or {}
+
+class Oky.Views.TemplateView extends Oky.View
+  template: 'NotSet'
   className: 'templateview'
   
   initialize: (options) ->
@@ -32,8 +57,8 @@ class TemplateView extends DHM.View
 Generic Views
 ###
 
-class TableView extends TemplateView
-  template: 'Table'
+class Oky.Views.TableView extends Oky.Views.TemplateView
+  template: 'TableView'
   labelAttribute: 'name'
   layout: height: type: 'fill'
   scrolling: false
@@ -42,17 +67,16 @@ class TableView extends TemplateView
   
   initialize: (options = {}) ->
     super
-    this.setCollection(options.collection or new DHM.Collection())
+    this.setCollection(options.collection or new Oky.Collection())
 
   setCollection: (@collection) ->
 
   getContext: -> list: this.buildListItems()
 
   buildListItems: ->
-    @collection.map((item) =>
+    @collection.map (item) =>
       id: item.cid
       label: this.getItemLabel(item)
-    )
 
   getItemLabel: (item) -> item.get(@labelAttribute)
 
@@ -77,7 +101,7 @@ class TableView extends TemplateView
     return false
 
 
-class FilterableTableView extends TableView
+class Oky.Views.FilterableTableView extends Oky.Views.TableView
   messageNoItems: 'Sorry, no items were found'
 
   className: 'filterabletableview'
@@ -96,14 +120,14 @@ class FilterableTableView extends TableView
     if @collection.length
       super
     else
-      this.$el.html(JST['Passthrough'](content: @messageNoItems))
+      this.$el.html(JST['Default'](content: @messageNoItems))
     return this
 
 
-class FieldView extends TemplateView
+class Oky.Views.FieldView extends Oky.Views.TemplateView
   @instanceProperties: ['layout', 'fieldAttributes']
 
-  template: 'Field'
+  template: 'FieldView'
   fieldAttributes:
     type: 'text'
     class: 'field-text'
@@ -140,8 +164,8 @@ class FieldView extends TemplateView
     return false
 
 
-class ContentView extends TemplateView
-  template: 'Content'
+class Oky.Views.ContentView extends Oky.Views.TemplateView
+  template: 'ContentView'
 
   className: 'contentview'
   
@@ -150,13 +174,13 @@ class ContentView extends TemplateView
     @context = content: if options.content? then options.content else 'Content not set'
 
 
-class MessageView extends ContentView
-  template: 'Message'
+class Oky.Views.MessageView extends Oky.Views.ContentView
+  template: 'MessageView'
 
   className: 'messageview'
   
 
-class FormView extends DHM.View
+class Oky.Views.FormView extends Oky.View
   className: 'formview'
 
   subviews: {}
@@ -166,15 +190,15 @@ class FormView extends DHM.View
   render: ->
     this.$el.empty()
     this.$form = $('<form></form>')
-    _.each(_.sortBy(@subviews,'weight'), (subview) =>
+    _.each _.sortBy(@subviews,'weight'), (subview) =>
       this.$form.append(subview.view.render().el)
-    )
+
     this.$el.append(this.$form)
     return this
 
 
-class TitleBarView extends TemplateView
-  template: 'TitleBar'
+class Oky.Views.TitleBarView extends Oky.Views.TemplateView
+  template: 'TitleBarView'
   title: 'TitleBarView'
   next: 'Next'
   prev: 'Back'
@@ -204,8 +228,8 @@ class TitleBarView extends TemplateView
     return false
 
 
-class TabBarView extends TemplateView
-  template: 'TabBar'
+class Oky.Views.TabBarView extends Oky.Views.TemplateView
+  template: 'TabBarView'
   layout: height: type: 'fixed'
 
   className: 'tabbarview'
@@ -241,7 +265,7 @@ class TabBarView extends TemplateView
 ###
 Base class for any view which has a titlebar and next/prev controls
 ###
-class NavigableView extends DHM.View
+class Oky.Views.NavigableView extends Oky.View
   titleBarView: null
   contentView: null
   ###
@@ -262,7 +286,7 @@ class NavigableView extends DHM.View
     super
 
     if not @titleBarView? then @titleBarView = new TitleBarView(proxy: this)
-    if not @contentView? then @contentView = new DHM.View()
+    if not @contentView? then @contentView = new Oky.View()
 
     # contentViews generally use 'fill height' layout
     _.defaults(@contentView, layout: height: type: 'fill')

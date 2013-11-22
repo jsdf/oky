@@ -37,3 +37,5 @@ xcshareddata
 .idea
 node_modules
 dist
+
+examples/app.js

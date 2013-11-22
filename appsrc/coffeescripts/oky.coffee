@@ -1,12 +1,12 @@
-# Doghouse Mobile framework
+# Oky framework
 # -------------------------
 
-DHM = DHM or {}
+Oky = Oky or {}
 
-class DHM.Collection extends Backbone.Collection
+class Oky.Collection extends Backbone.Collection
   getConstructor: -> Object.getPrototypeOf(this).constructor
 
-class DHM.Router extends Backbone.Router
+class Oky.Router extends Backbone.Router
   # default transition is 'prev' to handle back button case
   defaultTransition: 'prev'
 
@@ -54,10 +54,11 @@ class DHM.Router extends Backbone.Router
     else
       location.pathname.substring(1)
 
-class DHM.View extends Backbone.View
+class Oky.View extends Backbone.View
   # These properties are duplicated for each instance upon construction (not just prototypically delegated).
-  # This includes deep structured objects, such as those used for DHM.Layout and jQuery plugin options.
+  # This includes deep structured objects, such as those used for Oky.Layout and jQuery plugin options.
   @instanceProperties: ['layout']
+  @debugEvents: false
 
   className: 'view'
 
@@ -78,7 +79,7 @@ class DHM.View extends Backbone.View
       @proxy = this
 
     # debug events
-    this.on('all', -> console.debug(arguments))
+    this.on('all', -> console.debug(arguments)) if Oky.View.debugEvents
 
   # Traverse prototype chain to collect 'className' properties of all superclasses
   # This allows the CSS classes on a view to reflect its view class hierarchy
@@ -120,7 +121,7 @@ class DHM.View extends Backbone.View
 
 # Main application view to which all other views are attached
 # Primarily to provide transitions and subview layout
-class DHM.AppView extends DHM.View
+class Oky.AppView extends Oky.View
   className: 'appview'
   activeViews: []
   currentView: null
@@ -153,7 +154,7 @@ class DHM.AppView extends DHM.View
     this.$el.append(@currentView.render().el)
 
     # layout can be applied once all views are rendered and attached to the DOM
-    DHM.Layout.applyLayout(this)
+    Oky.Layout.applyLayout(this)
 
     if @activeViews.length
       oldView = _.last(@activeViews)
@@ -239,15 +240,13 @@ class DHM.AppView extends DHM.View
         else
           translateOrigin = 'translate(0, 0)'
 
-        appView.$el.css(
+        appView.$el.css
           'transform': translateOrigin
           '-webkit-transform': translateOrigin
-        )
       else
-        appView.$el.css(
+        appView.$el.css
           'position': 'relative'
           'left': 0
-        )
 
     # Set or reset css transition property on view container
     transition: ($container, duration, easing) ->
@@ -257,10 +256,9 @@ class DHM.AppView extends DHM.View
       else
         transition = 'none'
 
-      $container.css(
+      $container.css
         'transition': transition
         '-webkit-transition': transition
-      )
 
     fn:
       next: (appView, view) ->
@@ -284,8 +282,10 @@ class DHM.AppView extends DHM.View
             appView.$el.animate('translate': view.$el.width()+'px, 0', appView.transitionDuration, 'ease-in-out')
         else
           appView.$el.animate('left': view.$el.width()+'px', appView.transitionDuration, 'ease-in-out')
+
 # @mixin
-DHM.Layout =
+# Rather than using this, you should use flexbox
+Oky.Layout =
   dimensions: ['height', 'width']
 
   # Applies fixed dimensions to views to fill space allowed by other views with 
