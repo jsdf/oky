@@ -8,7 +8,7 @@ Oky is built with:
 - [Ratchet](http://maker.github.io/ratchet/)  
 - [Handlebars](http://handlebarsjs.com/)
 
-To get up and running, `npm install` the dependencies and then `grunt build` to 
+To get up and running, `npm install` the dependencies, `npm install -g grunt-cli http-server` for global dependencies, and then `grunt build` to 
 compile Oky into the `dist` directory.
 
 Check out the example project: run `grunt examples` then head to 
